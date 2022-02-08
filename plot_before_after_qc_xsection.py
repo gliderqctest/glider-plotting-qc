@@ -32,7 +32,7 @@ def plot_xsection(figure, axis, x, y, z, cmap, title):
     axis.set_ylabel('Depth (m)')
 
     # format x-axis
-    xfmt = mdates.DateFormatter('%Y-%m-%d')
+    xfmt = mdates.DateFormatter('%Y\n%m-%d')
     axis.xaxis.set_major_formatter(xfmt)
     axis.xaxis.set_tick_params()
 

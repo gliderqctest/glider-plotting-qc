@@ -2,7 +2,7 @@
 
 """
 Author: lgarzio on 1/26/2022
-Last modified: lgarzio on 1/26/2022
+Last modified: lgarzio on 2/9/2022
 Plot groups of profiles for science data defined by the user, values flagged by QC variables are highlighted.
 Data are plotted from sci-profile datasets downloaded from RUCOOL's glider ERDDAP server using download_dataset.py
 """
@@ -78,6 +78,10 @@ def main(ncf, sdir, nprof, inst_list):
                 save_filename = f'{cv}_qc_{t0save}-{t1save}.png'
 
                 data = dss[cv]
+
+                # in some cases, ERDDAP doesn't set the metadata/fill values, so get rid of any possible fill values
+                data[data > 10000] = np.nan
+
                 pressure = dss.pressure
                 fig, ax = plt.subplots(figsize=(8, 10))
 
@@ -117,7 +121,11 @@ def main(ncf, sdir, nprof, inst_list):
 
                 ax.invert_yaxis()
                 ax.set_ylabel('Pressure (dbar)')
-                ax.set_xlabel(f'{cv}')
+
+                try:
+                    units = data.units
+                except AttributeError:
+                    units = 'no_attributes'
                 ttl = f'{deploy} {t0str} to {t1str}'
                 ax.set_title(ttl)
 

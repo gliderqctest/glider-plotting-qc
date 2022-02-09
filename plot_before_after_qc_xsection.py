@@ -2,7 +2,7 @@
 
 """
 Author: lgarzio on 2/8/2022
-Last modified: lgarzio on 2/8/2022
+Last modified: lgarzio on 2/9/2022
 Plot cross-sections for glider science data defined by the user, before and after QC flags are applied.
 Data are plotted from sci-profile datasets downloaded from RUCOOL's glider ERDDAP server using download_dataset.py
 """
@@ -26,7 +26,11 @@ def plot_xsection(figure, axis, x, y, z, cmap, title):
     divider = make_axes_locatable(axis)
     cax = divider.new_horizontal(size='5%', pad=0.1, axes_class=plt.Axes)
     figure.add_axes(cax)
-    cb = plt.colorbar(xc, cax=cax, label=f'{z.name} ({z.units})')
+    try:
+        units = z.units
+    except AttributeError:
+        units = 'no_attributes'
+    cb = plt.colorbar(xc, cax=cax, label=f'{z.name} ({units})')
 
     # add y-axis label
     axis.set_ylabel('Depth (m)')
@@ -75,6 +79,11 @@ def main(ncf, sdir, inst_list, dr):
 
         data = ds[cv]
 
+        # in some cases, ERDDAP doesn't set the metadata/fill values, so get rid of any possible fill values
+        data[data > 10000] = np.nan
+
+        data_count = int(np.sum(~np.isnan(data)))
+
         # plot data without QC applied
         plot_xsection(fig, ax1, ds.time, depth, data, cmaps[cv], 'without QC')
 
@@ -94,7 +103,6 @@ def main(ncf, sdir, inst_list, dr):
                 data[qc_idx] = np.nan
                 qc_count += len(qc_idx)
 
-        plot_xsection(fig, ax2, ds.time, depth, data, cmaps[cv], f'with QC (removed {qc_count} data points)')
 
         ax1.invert_yaxis()
         ttl = f'Before and After QC: {deploy}'

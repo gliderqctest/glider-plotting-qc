@@ -141,6 +141,7 @@ def main(args):
 
                     ax.invert_yaxis()
                     ax.set_ylabel('Pressure (dbar)')
+                    ax.ticklabel_format(useOffset=False)  # don't use scientific notation for ticks
                     ax.set_xlabel(f'{cv} ({data.units})')
                     ttl = f'{deployment} {t0str} to {t1str}'
                     ax.set_title(ttl)
